@@ -22,12 +22,22 @@ def proof_of_work(last_proof):
     """
 
     start = timer()
-
+    print(start)
     print("Searching for next proof")
-    proof = 0
-    #  TODO: Your code here
+    proof = 5000
+    while valid_proof(last_proof, proof) is False:
+        proof += 1
+        #print("bad proof")
 
     print("Proof found: " + str(proof) + " in " + str(timer() - start))
+    print(proof)
+    print(last_proof)
+    previous_proof = f'{last_proof}'.encode()
+    previous_proof_hash = hashlib.sha256(previous_proof).hexdigest()
+    new_proof = f'{proof}'.encode()
+    new_proof_hash = hashlib.sha256(new_proof).hexdigest()
+    
+    print(f"COMPARED HASHES: {previous_proof_hash}, {new_proof_hash}")
     return proof
 
 
@@ -40,7 +50,18 @@ def valid_proof(last_hash, proof):
     """
 
     # TODO: Your code here!
-    pass
+    start = timer()
+    #print(last_hash)
+    #print(proof)
+    previous_proof = f'{last_hash}'.encode()
+    #print(previous_proof[-6:])
+    previous_proof_hash = hashlib.sha256(previous_proof).hexdigest()
+    new_proof = f'{proof}'.encode()
+    #print(new_proof[:6])
+    new_proof_hash = hashlib.sha256(new_proof).hexdigest()
+    #print(new_proof_hash[-6:])
+    #print(previous_proof_hash[:6])
+    return previous_proof_hash[-6:] == new_proof_hash[:6]
 
 
 if __name__ == '__main__':
@@ -70,7 +91,9 @@ if __name__ == '__main__':
 
         post_data = {"proof": new_proof,
                      "id": id}
-
+        #print(new_proof)
+        #print(data.get('proof'))             
+        
         r = requests.post(url=node + "/mine", json=post_data)
         data = r.json()
         if data.get('message') == 'New Block Forged':
